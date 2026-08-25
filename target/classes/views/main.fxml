@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.example.gestion.controller.MainController">
+
+    <left>
+        <VBox styleClass="sidebar" spacing="6">
+            <Label text="GestionSalles" styleClass="brand"/>
+            <Button fx:id="btnNavProf" text="Professeurs" onAction="#onNavProf" styleClass="nav-button"/>
+            <Button fx:id="btnNavSalle" text="Salles" onAction="#onNavSalle" styleClass="nav-button"/>
+            <Button fx:id="btnNavOccuper" text="Occupations" onAction="#onNavOccuper" styleClass="nav-button"/>
+        </VBox>
+    </left>
+
+    <center>
+        <StackPane fx:id="centerPane">
+            <padding>
+                <Insets top="14" right="18" bottom="18" left="18"/>
+            </padding>
+        </StackPane>
+    </center>
+
+</BorderPane>
