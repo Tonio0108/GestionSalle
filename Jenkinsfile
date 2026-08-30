@@ -24,13 +24,13 @@ pipeline {
 
         stage('Compile') {
             steps {
-                sh 'mvn compile -B'
+                bat 'mvn compile -B'
             }
         }
 
         stage('Test') {
             steps {
-                sh 'mvn test -B'
+                bat 'mvn test -B'
             }
             post {
                 always {
@@ -41,7 +41,7 @@ pipeline {
 
         stage('Package JAR') {
             steps {
-                sh 'mvn package -DskipTests -B'
+                bat 'mvn package -DskipTests -B'
             }
             post {
                 success {
@@ -55,7 +55,7 @@ pipeline {
                 environment name: 'BUILD_EXE', value: 'true'
             }
             steps {
-                sh 'mvn jpackage:jpackage -B'
+                bat 'mvn jpackage:jpackage -B'
             }
             post {
                 success {
