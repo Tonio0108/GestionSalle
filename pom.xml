@@ -45,6 +45,12 @@
             <artifactId>javafx-fxml</artifactId>
             <version>${javafx.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -60,6 +66,23 @@
                 <version>0.0.8</version>
                 <configuration>
                     <mainClass>com.example.gestion.GestionApplication</mainClass>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.panteleyev</groupId>
+                <artifactId>jpackage-maven-plugin</artifactId>
+                <version>1.6.0</version>
+                <configuration>
+                    <name>gestion-salles</name>
+                    <appVersion>${project.version}</appVersion>
+                    <vendor>Gestion Salles</vendor>
+                    <mainClass>com.example.gestion.GestionApplication</mainClass>
+                    <modulePath>${project.build.outputDirectory}</modulePath>
+                    <type>exe</type>
+                    <winDirChooser>true</winDirChooser>
+                    <winMenu>true</winMenu>
+                    <winShortcut>true</winShortcut>
                 </configuration>
             </plugin>
         </plugins>

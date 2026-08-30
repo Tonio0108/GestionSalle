@@ -1,16 +1,16 @@
 -- =============================================================
--- Evolution : les occupations ont une heure precise
--- Cle primaire etendue : (codeprof, codesal, date, heure)
+-- Evolution annulee : les occupations n'ont plus d'heure precise
+-- Cle primaire d'origine : (codeprof, codesal, date)
 -- =============================================================
-
-ALTER TABLE occuper ADD COLUMN IF NOT EXISTS heure TIME NOT NULL DEFAULT '08:00';
 
 ALTER TABLE occuper DROP CONSTRAINT IF EXISTS occuper_pkey;
 
 ALTER TABLE occuper ADD CONSTRAINT occuper_pkey
-    PRIMARY KEY (codeprof, codesal, date, heure);
+    PRIMARY KEY (codeprof, codesal, date);
 
-DROP INDEX IF EXISTS ux_occuper_salle_date;
+DROP INDEX IF EXISTS ux_occuper_salle_date_heure;
 
-CREATE UNIQUE INDEX IF NOT EXISTS ux_occuper_salle_date_heure
-    ON occuper (codesal, date, heure);
+CREATE UNIQUE INDEX IF NOT EXISTS ux_occuper_salle_date
+    ON occuper (codesal, date);
+
+ALTER TABLE occuper DROP COLUMN IF EXISTS heure;

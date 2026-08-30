@@ -80,10 +80,7 @@ public class ProfService {
             throw new IllegalArgumentException(
                     "Le nom doit contenir entre 2 et 100 lettres (espaces, tirets et apostrophes autorisés).");
         }
-        if (prenom.isEmpty()) {
-            throw new IllegalArgumentException("Le prénom est obligatoire.");
-        }
-        if (!NOM_PATTERN.matcher(prenom).matches()) {
+        if (!prenom.isEmpty() && !NOM_PATTERN.matcher(prenom).matches()) {
             throw new IllegalArgumentException(
                     "Le prénom doit contenir entre 2 et 100 lettres (espaces, tirets et apostrophes autorisés).");
         }
@@ -95,10 +92,18 @@ public class ProfService {
     }
 
     private void verifierUnicite(String nom, String prenom, Integer codeExclu) {
-        boolean existe = profRepository.findByNomPrenom(nom, prenom).stream()
-                .anyMatch(p -> !p.getCodeprof().equals(codeExclu));
+        boolean existe;
+        if (prenom == null || prenom.isBlank()) {
+            existe = profRepository.findByNomExact(nom).stream()
+                    .filter(p -> p.getPrenom() == null || p.getPrenom().isBlank())
+                    .anyMatch(p -> !p.getCodeprof().equals(codeExclu));
+        } else {
+            existe = profRepository.findByNomPrenom(nom, prenom).stream()
+                    .anyMatch(p -> !p.getCodeprof().equals(codeExclu));
+        }
         if (existe) {
-            throw new IllegalStateException("Un professeur nommé « " + nom + " " + prenom + " » existe déjà.");
+            String libelle = prenom == null || prenom.isBlank() ? nom : nom + " " + prenom;
+            throw new IllegalStateException("Un professeur nommé « " + libelle + " » existe déjà.");
         }
     }
 }

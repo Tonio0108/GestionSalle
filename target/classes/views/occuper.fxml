@@ -43,7 +43,6 @@
                 <TableColumn fx:id="colCodeSalle" text="Code salle" prefWidth="90" minWidth="70" style="-fx-alignment: CENTER;"/>
                 <TableColumn fx:id="colSalle" text="Salle" prefWidth="240" minWidth="120"/>
                 <TableColumn fx:id="colDate" text="Date" prefWidth="120" minWidth="90" style="-fx-alignment: CENTER;"/>
-                <TableColumn fx:id="colHeure" text="Heure" prefWidth="90" minWidth="70" style="-fx-alignment: CENTER;"/>
             </columns>
             <columnResizePolicy>
                 <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>

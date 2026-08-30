@@ -20,6 +20,8 @@ public class ProfRepository {
             "SELECT codeprof, nom, prenom, grade FROM prof WHERE codeprof = ?";
     private static final String SQL_FIND_BY_NOM =
             "SELECT codeprof, nom, prenom, grade FROM prof WHERE nom ILIKE ? ORDER BY codeprof";
+    private static final String SQL_FIND_BY_NOM_EXACT =
+            "SELECT codeprof, nom, prenom, grade FROM prof WHERE lower(btrim(nom)) = lower(?)";
     private static final String SQL_FIND_BY_NOM_PRENOM =
             "SELECT codeprof, nom, prenom, grade FROM prof "
                     + "WHERE lower(btrim(nom)) = lower(?) AND lower(btrim(prenom)) = lower(?)";
@@ -54,6 +56,10 @@ public class ProfRepository {
 
     public List<Prof> findByNom(String nom) {
         return jdbcTemplate.query(SQL_FIND_BY_NOM, MAPPER, "%" + nom + "%");
+    }
+
+    public List<Prof> findByNomExact(String nom) {
+        return jdbcTemplate.query(SQL_FIND_BY_NOM_EXACT, MAPPER, nom);
     }
 
     public List<Prof> findByNomPrenom(String nom, String prenom) {

@@ -26,7 +26,6 @@ import javafx.util.Duration;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -35,7 +34,6 @@ import java.util.stream.Collectors;
 public class OccuperController {
 
     private static final DateTimeFormatter FORMAT_DATE = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-    private static final DateTimeFormatter FORMAT_HEURE = DateTimeFormatter.ofPattern("HH:mm");
 
     private static final ButtonType BOUTON_OUI = new ButtonType("Oui", ButtonBar.ButtonData.YES);
     private static final ButtonType BOUTON_NON = new ButtonType("Non", ButtonBar.ButtonData.CANCEL_CLOSE);
@@ -63,8 +61,6 @@ public class OccuperController {
     @FXML
     private TableColumn<Occuper, LocalDate> colDate;
     @FXML
-    private TableColumn<Occuper, LocalTime> colHeure;
-    @FXML
     private Label lblStatus;
 
     private final ObservableList<Occuper> donnees = FXCollections.observableArrayList();
@@ -88,14 +84,6 @@ public class OccuperController {
             protected void updateItem(LocalDate item, boolean vide) {
                 super.updateItem(item, vide);
                 setText(vide || item == null ? null : item.format(FORMAT_DATE));
-            }
-        });
-        colHeure.setCellValueFactory(c -> new SimpleObjectProperty<>(c.getValue().getHeure()));
-        colHeure.setCellFactory(colonne -> new TableCell<>() {
-            @Override
-            protected void updateItem(LocalTime item, boolean vide) {
-                super.updateItem(item, vide);
-                setText(vide || item == null ? null : item.format(FORMAT_HEURE));
             }
         });
 
@@ -137,7 +125,7 @@ public class OccuperController {
         dialog.initOwner(tableOccuper.getScene().getWindow());
         dialog.showAndWait().ifPresent(creee -> {
             refresh();
-            selectionnerOccupation(creee.getCodeprof(), creee.getCodesal(), creee.getDate(), creee.getHeure());
+            selectionnerOccupation(creee.getCodeprof(), creee.getCodesal(), creee.getDate());
             statutSucces("Occupation enregistrée");
         });
     }
@@ -155,7 +143,7 @@ public class OccuperController {
         dialog.initOwner(tableOccuper.getScene().getWindow());
         dialog.showAndWait().ifPresent(modifiee -> {
             refresh();
-            selectionnerOccupation(modifiee.getCodeprof(), modifiee.getCodesal(), modifiee.getDate(), modifiee.getHeure());
+            selectionnerOccupation(modifiee.getCodeprof(), modifiee.getCodesal(), modifiee.getDate());
             statutSucces("Occupation modifiée");
         });
     }
@@ -176,8 +164,7 @@ public class OccuperController {
         }
         String detail = cibles.stream()
                 .map(o -> o.getNomProf() + " — " + o.getDesignationSalle()
-                        + " — " + o.getDate().format(FORMAT_DATE)
-                        + " à " + o.getHeure().format(FORMAT_HEURE))
+                        + " — " + o.getDate().format(FORMAT_DATE))
                 .limit(8)
                 .collect(Collectors.joining("\n"))
                 + (cibles.size() > 8 ? "\n..." : "");
@@ -191,12 +178,11 @@ public class OccuperController {
             for (Occuper cible : cibles) {
                 try {
                     occuperService.supprimer(cible.getCodeprof(), cible.getCodesal(),
-                            cible.getDate(), cible.getHeure());
+                            cible.getDate());
                     succes++;
                 } catch (Exception e) {
                     echecs.append("- ").append(cible.getNomProf()).append(" (")
-                            .append(cible.getDate().format(FORMAT_DATE)).append(" ")
-                            .append(cible.getHeure().format(FORMAT_HEURE))
+                            .append(cible.getDate().format(FORMAT_DATE))
                             .append(") : erreur.\n");
                 }
             }
@@ -209,12 +195,11 @@ public class OccuperController {
         });
     }
 
-    private void selectionnerOccupation(Integer codeprof, Integer codesal, LocalDate date, LocalTime heure) {
+    private void selectionnerOccupation(Integer codeprof, Integer codesal, LocalDate date) {
         donnees.stream()
                 .filter(o -> o.getCodeprof().equals(codeprof)
                         && o.getCodesal().equals(codesal)
-                        && o.getDate().equals(date)
-                        && o.getHeure().equals(heure))
+                        && o.getDate().equals(date))
                 .findFirst()
                 .ifPresent(o -> {
                     tableOccuper.getSelectionModel().clearSelection();

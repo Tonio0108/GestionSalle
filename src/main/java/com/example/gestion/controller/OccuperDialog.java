@@ -25,18 +25,13 @@ import javafx.scene.layout.VBox;
 import javafx.geometry.Insets;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 
 public class OccuperDialog extends Dialog<Occuper> {
 
     private static final DateTimeFormatter FORMAT_DATE = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-    private static final DateTimeFormatter FORMAT_HEURE = DateTimeFormatter.ofPattern("HH:mm");
     private static final LocalDate DATE_MIN = LocalDate.of(2010, 1, 1);
-    private static final LocalTime HEURE_MIN = LocalTime.of(7, 0);
-    private static final LocalTime HEURE_MAX = LocalTime.of(19, 30);
 
     private final OccuperService occuperService;
     private final ProfService profService;
@@ -45,7 +40,6 @@ public class OccuperDialog extends Dialog<Occuper> {
     private final boolean modification;
     private final ComboBox<Prof> cmbProf = new ComboBox<>();
     private final ComboBox<Salle> cmbSalle = new ComboBox<>();
-    private final ComboBox<LocalTime> cmbHeure = new ComboBox<>();
     private final DatePicker dpDate = new DatePicker(LocalDate.now());
     private final Label lblErreur = new Label();
     private Occuper resultat;
@@ -69,14 +63,12 @@ public class OccuperDialog extends Dialog<Occuper> {
 
         cmbProf.setMaxWidth(Double.MAX_VALUE);
         cmbSalle.setMaxWidth(Double.MAX_VALUE);
-        cmbHeure.setMaxWidth(Double.MAX_VALUE);
         dpDate.setMaxWidth(Double.MAX_VALUE);
         dpDate.setEditable(false);
         lblErreur.setWrapText(true);
 
         configurerComboProf();
         configurerComboSalle();
-        configurerComboHeure();
         configurerDatePicker();
 
         if (modification) {
@@ -87,7 +79,6 @@ public class OccuperDialog extends Dialog<Occuper> {
                     .filter(s -> s.getCodesal().equals(existant.getCodesal()))
                     .findFirst().ifPresent(cmbSalle::setValue);
             dpDate.setValue(existant.getDate());
-            cmbHeure.setValue(existant.getHeure());
         }
 
         GridPane grille = new GridPane();
@@ -105,9 +96,7 @@ public class OccuperDialog extends Dialog<Occuper> {
         grille.add(new Label("Salle :"), 0, ligne);
         grille.add(cmbSalle, 1, ligne++);
         grille.add(new Label("Date :"), 0, ligne);
-        grille.add(dpDate, 1, ligne++);
-        grille.add(new Label("Heure :"), 0, ligne);
-        grille.add(cmbHeure, 1, ligne);
+        grille.add(dpDate, 1, ligne);
 
         VBox contenu = new VBox(10, grille, lblErreur);
         contenu.setPadding(new Insets(0, 4, 0, 4));
@@ -161,36 +150,6 @@ public class OccuperDialog extends Dialog<Occuper> {
         });
     }
 
-    private void configurerComboHeure() {
-        List<LocalTime> creneaux = new ArrayList<>();
-        for (LocalTime t = HEURE_MIN; !t.isAfter(HEURE_MAX); t = t.plusMinutes(30)) {
-            creneaux.add(t);
-        }
-        cmbHeure.getItems().setAll(creneaux);
-        if (!modification) {
-            cmbHeure.setValue(creneauParDefaut(creneaux));
-        }
-        cmbHeure.setConverter(new StringConverter<>() {
-            @Override
-            public String toString(LocalTime time) {
-                return time == null ? "" : time.format(FORMAT_HEURE);
-            }
-
-            @Override
-            public LocalTime fromString(String string) {
-                return null;
-            }
-        });
-    }
-
-    private LocalTime creneauParDefaut(List<LocalTime> creneaux) {
-        LocalTime maintenant = LocalTime.now();
-        return creneaux.stream()
-                .filter(t -> !t.isBefore(maintenant))
-                .findFirst()
-                .orElse(HEURE_MIN);
-    }
-
     private void configurerDatePicker() {
         dpDate.setDayCellFactory(picker -> new DateCell() {
             @Override
@@ -210,16 +169,15 @@ public class OccuperDialog extends Dialog<Occuper> {
             Prof prof = cmbProf.getValue();
             Salle salle = cmbSalle.getValue();
             LocalDate date = dpDate.getValue();
-            LocalTime heure = cmbHeure.getValue();
-            if (prof == null || salle == null || date == null || heure == null) {
-                throw new IllegalArgumentException("Le professeur, la salle, la date et l'heure sont obligatoires.");
+            if (prof == null || salle == null || date == null) {
+                throw new IllegalArgumentException("Le professeur, la salle et la date sont obligatoires.");
             }
-            Occuper occuper = new Occuper(prof.getCodeprof(), salle.getCodesal(), date, heure);
+            Occuper occuper = new Occuper(prof.getCodeprof(), salle.getCodesal(), date);
             if (existant == null) {
                 occuperService.enregistrer(occuper);
             } else {
                 occuperService.modifier(existant.getCodeprof(), existant.getCodesal(),
-                        existant.getDate(), existant.getHeure(), occuper);
+                        existant.getDate(), occuper);
             }
             resultat = occuper;
             return true;
