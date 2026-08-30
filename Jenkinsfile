@@ -1,14 +1,16 @@
 pipeline {
     agent any
 
-    tools {
-        maven 'Maven-3.9.16'
-        jdk 'JDK-21.0.12.1'
-    }
-
     environment {
         APP_NAME = 'gestion-salles'
         APP_VERSION = '1.0.0'
+        // Outils : on utilise MAVEN_HOME et JAVA_HOME définis sur l'hôte.
+        // Pour un contrôle précis, configurer des outils nommés dans
+        // "Global Tool Configuration" puis décommenter le bloc tools ci-dessous.
+        // tools {
+        //     maven 'Maven-3.9'
+        //     jdk 'JDK-21'
+        // }
         // À activer sur un nœud Windows avec WiX Toolset installé :
         // BUILD_EXE = 'true'
     }
