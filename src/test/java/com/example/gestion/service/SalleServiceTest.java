@@ -131,4 +131,13 @@ class SalleServiceTest {
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("occupations");
     }
+
+    @Test
+    void toString_afficheCodeEtDesignation() {
+        Salle salle = new Salle(3, "Salle C");
+
+        assertThat(salle.toString())
+                .contains("codesal=3")
+                .contains("designation='Salle C'");
+    }
 }

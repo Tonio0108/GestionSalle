@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    triggers {
+        pollSCM('H/2 * * * *')
+    }
+
     environment {
         APP_NAME = 'gestion-salles'
         APP_VERSION = '1.0.0'
