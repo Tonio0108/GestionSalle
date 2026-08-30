@@ -39,7 +39,7 @@ public class GestionApplication extends Application {
 
             Scene scene = new Scene(root, 1150, 720);
             scene.getStylesheets().add(getClass().getResource("/styles/style.css").toExternalForm());
-            stage.setTitle("Gestion des salles de classe");
+            stage.setTitle("Gestion des salles");
             stage.setMaximized(true);
             stage.setMinWidth(980);
             stage.setMinHeight(620);
