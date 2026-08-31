@@ -8,22 +8,13 @@ pipeline {
     environment {
         APP_NAME = 'gestion-salles'
         APP_VERSION = '1.0.0'
-        // SonarQube : URL et token. À fournir via les credentials Jenkins
-        // (ou variables globales). Ex. d'overrides dans la config du job.
+
         SONAR_HOST_URL = 'http://localhost:9000'
         SONAR_TOKEN = credentials('sonar-token')
-        // Outils : on utilise MAVEN_HOME et JAVA_HOME définis sur l'hôte.
-        // Pour un contrôle précis, configurer des outils nommés dans
-        // "Global Tool Configuration" puis décommenter le bloc tools ci-dessous.
-        // tools {
-        //     maven 'Maven-3.9'
-        //     jdk 'JDK-21'
-        // }
-        // À activer sur un nœud Windows avec WiX Toolset installé :
-        // BUILD_EXE = 'true'
     }
 
     stages {
+
         stage('Checkout') {
             steps {
                 checkout scm
@@ -32,7 +23,7 @@ pipeline {
 
         stage('Compile') {
             steps {
-                bat 'mvn compile -B'
+                bat 'mvn clean compile -B'
             }
         }
 
@@ -40,6 +31,7 @@ pipeline {
             steps {
                 bat 'mvn test -B'
             }
+
             post {
                 always {
                     junit '**/target/surefire-reports/*.xml'
@@ -47,13 +39,18 @@ pipeline {
             }
         }
 
-        stage('SonarQube') {
+        stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('SonarQube') {
-                    bat 'mvn sonar:sonar -Dsonar.host.url=%SONAR_HOST_URL% -Dsonar.token=%SONAR_AUTH_TOKEN% -B'
-                    timeout(time: 5, unit: 'MINUTES') {
-                        waitForQualityGate abortPipeline: true
-                    }
+                    bat 'mvn sonar:sonar -Dsonar.host.url=%SONAR_HOST_URL% -Dsonar.token=%SONAR_TOKEN% -B'
+                }
+            }
+        }
+
+        stage('Quality Gate') {
+            steps {
+                timeout(time: 5, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
                 }
             }
         }
@@ -62,22 +59,11 @@ pipeline {
             steps {
                 bat 'mvn package -DskipTests -B'
             }
+
             post {
                 success {
-                    archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
-                }
-            }
-        }
-        stage('Package EXE') {
-            when {
-                environment name: 'BUILD_EXE', value: 'true'
-            }
-            steps {
-                bat 'mvn jpackage:jpackage -B'
-            }
-            post {
-                success {
-                    archiveArtifacts artifacts: 'target/*.exe', fingerprint: true
+                    archiveArtifacts artifacts: 'target/*.jar',
+                                     fingerprint: true
                 }
             }
         }
@@ -87,6 +73,7 @@ pipeline {
         success {
             echo 'Build terminé avec succès!'
         }
+
         failure {
             echo 'Build échoué!'
         }
