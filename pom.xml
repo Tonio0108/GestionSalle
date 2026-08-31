@@ -20,7 +20,7 @@
     <properties>
         <java.version>21</java.version>
         <javafx.version>21.0.12</javafx.version>
-        <sonar.projectKey>gestion-salles</sonar.projectKey>
+        <sonar.projectKey>GestionSalle</sonar.projectKey>
         <sonar.host.url>${env.SONAR_HOST_URL}</sonar.host.url>
         <sonar.login>${env.SONAR_TOKEN}</sonar.login>
         <sonar.junit.reportPaths>target/surefire-reports</sonar.junit.reportPaths>
