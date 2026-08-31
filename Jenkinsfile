@@ -8,6 +8,10 @@ pipeline {
     environment {
         APP_NAME = 'gestion-salles'
         APP_VERSION = '1.0.0'
+        // SonarQube : URL et token. À fournir via les credentials Jenkins
+        // (ou variables globales). Ex. d'overrides dans la config du job.
+        SONAR_HOST_URL = 'http://localhost:9000'
+        SONAR_TOKEN = credentials('sonar-token')
         // Outils : on utilise MAVEN_HOME et JAVA_HOME définis sur l'hôte.
         // Pour un contrôle précis, configurer des outils nommés dans
         // "Global Tool Configuration" puis décommenter le bloc tools ci-dessous.
@@ -43,6 +47,21 @@ pipeline {
             }
         }
 
+        stage('SonarQube') {
+            steps {
+                bat 'mvn sonar:sonar -Dsonar.host.url=${SONAR_HOST_URL} -Dsonar.token=${SONAR_TOKEN} -B'
+            }
+            post {
+                success {
+                    withSonarQubeEnv('SonarQube') {
+                        timeout(time: 5, unit: 'MINUTES') {
+                            waitForQualityGate abortPipeline: true
+                        }
+                    }
+                }
+            }
+        }
+
         stage('Package JAR') {
             steps {
                 bat 'mvn package -DskipTests -B'
@@ -53,7 +72,6 @@ pipeline {
                 }
             }
         }
-
         stage('Package EXE') {
             when {
                 environment name: 'BUILD_EXE', value: 'true'
