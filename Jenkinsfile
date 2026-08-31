@@ -49,14 +49,10 @@ pipeline {
 
         stage('SonarQube') {
             steps {
-                bat 'mvn sonar:sonar -Dsonar.host.url=%SONAR_HOST_URL% -Dsonar.token=%SONAR_TOKEN% -B'
-            }
-            post {
-                success {
-                    withSonarQubeEnv('SonarQube') {
-                        timeout(time: 5, unit: 'MINUTES') {
-                            waitForQualityGate abortPipeline: true
-                        }
+                withSonarQubeEnv('SonarQube') {
+                    bat 'mvn sonar:sonar -Dsonar.host.url=%SONAR_HOST_URL% -Dsonar.token=%SONAR_TOKEN% -B'
+                    timeout(time: 5, unit: 'MINUTES') {
+                        waitForQualityGate abortPipeline: true
                     }
                 }
             }
