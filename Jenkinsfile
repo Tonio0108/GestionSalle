@@ -69,18 +69,20 @@ pipeline {
                         passwordVariable: 'NEXUS_PASSWORD'
                     )
                 ]) {
-                    def ws = pwd()
-                    writeFile file: "${ws}\\settings-nexus.xml", text: """<?xml version="1.0" encoding="UTF-8"?>
+                    script {
+                        def ws = pwd()
+                        writeFile file: "${ws}\\settings-nexus.xml", text: """<?xml version="1.0" encoding="UTF-8"?>
 <settings xmlns="http://maven.apache.org/SETTINGS/1.0.0">
   <servers>
     <server>
       <id>nexus-releases</id>
-      <username>${NEXUS_USERNAME}</username>
-      <password>${NEXUS_PASSWORD}</password>
+      <username>${env.NEXUS_USERNAME}</username>
+      <password>${env.NEXUS_PASSWORD}</password>
     </server>
   </servers>
 </settings>
 """
+                    }
                     bat 'mvn deploy -DskipTests -B -s settings-nexus.xml'
                 }
             }
