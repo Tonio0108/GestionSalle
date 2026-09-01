@@ -59,6 +59,32 @@ pipeline {
                 }
             }
         }
+
+        stage('Deploy Nexus') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'nexus-releases',
+                                                  usernameVariable: 'NEXUS_USERNAME',
+                                                  passwordVariable: 'NEXUS_PASSWORD')]) {
+                    writeFile file: 'settings-nexus.xml', text: """<?xml version="1.0" encoding="UTF-8"?>
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0">
+  <servers>
+    <server>
+      <id>nexus-releases</id>
+      <username>${NEXUS_USERNAME}</username>
+      <password>${NEXUS_PASSWORD}</password>
+    </server>
+  </servers>
+</settings>
+"""
+                    bat 'mvn deploy -DskipTests -B -s %WORKSPACE%\\settings-nexus.xml'
+                }
+            }
+            post {
+                success {
+                    echo 'Artifact publié sur Nexus Releases'
+                }
+            }
+        }
     }
 
     post {
