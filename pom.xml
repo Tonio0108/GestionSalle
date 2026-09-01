@@ -99,8 +99,8 @@
     <distributionManagement>
         <repository>
             <id>nexus-releases</id>
-            <name>Nexus Releases</name>
-            <url>http://localhost:8081/repository/maven-releases/</url>
+            <name>Gestion Salles Releases</name>
+            <url>http://localhost:8081/repository/gestion-salles-releases/</url>
         </repository>
     </distributionManagement>
 </project>
