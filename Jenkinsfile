@@ -62,10 +62,14 @@ pipeline {
 
         stage('Deploy Nexus') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'nexus-releases',
-                                                  usernameVariable: 'NEXUS_USERNAME',
-                                                  passwordVariable: 'NEXUS_PASSWORD')]) {
-                    bat 'mvn deploy -DskipTests -B -s %WORKSPACE%\\settings-nexus.xml'
+                withCredentials([
+                    usernamePassword(
+                        credentialsId: 'nexus-credentials',
+                        usernameVariable: 'NEXUS_USERNAME',
+                        passwordVariable: 'NEXUS_PASSWORD'
+                    )
+                ]) {
+                    bat 'mvn deploy -DskipTests -B -s "%WORKSPACE%\\settings-nexus.xml"'
                 }
             }
             post {
